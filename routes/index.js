@@ -17,7 +17,7 @@ router.get('/', function (req, res, next) {
     // });
     var mysql      = require('mysql');
     var connection = mysql.createConnection({
-        host     : 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
+        host     : 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com:3306',
         user     : 'tcc',
         password : 'thinkLight',
         database : 'tcc'
