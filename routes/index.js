@@ -28,7 +28,7 @@ router.get('/', function (req, res, next) {
         // database : 'image'
     });
     connection.connect();
-    connection.query("SELECT park_id, COUNT(*), SUM(price) FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-01' AND '2017-05-02' AND (type = 'SPOTHER' OR type = 'PAYOTHER’) GROUP BY park_id", function (error, results, fields) {
+    connection.query("SELECT park_id, COUNT(*), SUM(price) FROM tb_park_cost_trade WHERE (type = 'SPOTHER' OR type = 'PAYOTHER’) AND create_time BETWEEN '2017-05-01' AND '2017-05-02' GROUP BY park_id", function (error, results, fields) {
         if (error) throw error;
         res.send(results);
     });
