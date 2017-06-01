@@ -15,17 +15,18 @@ router.get('/', function (req, res, next) {
     //     res.send(arr);
     //     db.close();
     // });
-    var mysql      = require('mysql');
+
+    var mysql = require('mysql');
     var connection = mysql.createConnection({
-        host     : 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
-        user     : 'tcc',
-        password : 'thinkLight',
-        database : 'tcc'
+        host: 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
+        user: 'tcc',
+        password: 'thinkLight',
+        database: 'tcc'
     });
     connection.connect();
-    connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+    connection.query('SELECT * FROM image.tb_park_plate LIMIT 0, 10', function (error, results, fields) {
         if (error) throw error;
-        res.send(results[0].solution);
+        res.send(results);
     });
     connection.end();
 });
