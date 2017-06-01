@@ -24,7 +24,7 @@ router.get('/', function (req, res, next) {
         database: 'tcc'
     });
     connection.connect();
-    connection.query('SELECT * FROM image.tb_park_plate LIMIT 0, 10', function (error, results, fields) {
+    connection.query('SELECT 1+1', function (error, results, fields) {
         if (error) throw error;
         res.send(results);
     });
