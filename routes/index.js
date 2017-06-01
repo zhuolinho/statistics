@@ -92,7 +92,7 @@ router.get('/', function (req, res, next) {
                 }
             });
             for (var key in orders) {
-                str = str + key + "," +orders[key][0];
+                str = str + key + "," + parkInfo[key][0];
             }
             res.send(str);
             connection.end();
