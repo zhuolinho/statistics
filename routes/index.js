@@ -16,15 +16,16 @@ router.get('/', function (req, res, next) {
     // });
     var mysql      = require('mysql');
     var connection = mysql.createConnection({
-        host     : '54.222.179.73',
-        user     : 'image',
-        password : 'image@thinkLight',
-        database : 'image'
+        host     : 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
+        user     : 'root',
+        password : 'thinkLight',
+        database : 'tcc'
     });
     connection.connect();
     connection.query('SELECT * FROM image.tb_park_plate LIMIT 0, 10', function (error, results, fields) {
         if (error) throw error;
         res.send(results);
+        console.log(results[0].isneed);
     });
     connection.end();
 });
