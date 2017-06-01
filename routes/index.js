@@ -77,13 +77,13 @@ router.get('/', function (req, res, next) {
         results.forEach(function (order) {
             orders[order.park_id] = order;
         });
-        connection.query("SELECT park_id, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
+        connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额\n";
             results.forEach(function (trade) {
                 if (orders[trade.park_id]) {
-                    orders[trade.park_id].c = trade.count;
-                    orders[trade.park_id].s = trade.sum;
+                    orders[trade.park_id].c = trade.c;
+                    orders[trade.park_id].s = trade.s;
                 } else {
                     orders[trade.park_id] = trade;
                 }
