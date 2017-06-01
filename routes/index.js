@@ -61,17 +61,17 @@ router.get('/', function (req, res, next) {
     };
     var mysql = require('mysql');
     var connection = mysql.createConnection({
-        // host: 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
-        // user: 'tcc',
-        // password: 'thinkLight',
-        // database: 'tcc'
-        host     : '54.222.179.73',
-        user     : 'image',
-        password : 'image@thinkLight',
-        database : 'image'
+        host: 'rdstklduzjn711wfde1r7.mysql.rds.aliyuncs.com',
+        user: 'tcc',
+        password: 'thinkLight',
+        database: 'tcc'
+        // host     : '54.222.179.73',
+        // user     : 'image',
+        // password : 'image@thinkLight',
+        // database : 'image'
     });
     connection.connect();
-    connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2016-05-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
+    connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
         if (error) throw error;
         var orders = {};
         results.forEach(function (order) {
