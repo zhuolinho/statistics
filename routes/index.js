@@ -77,12 +77,12 @@ router.get('/', function (req, res, next) {
         results.forEach(function (order) {
             orders[order.park_id] = order;
         });
-        res.send(orders);
+        // res.send(orders);
         connection.query("SELECT park_id, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额\n";
             results.forEach(function (trade) {
-
+                if (orders[trade.park_id]) res.send(trade);
             });
             res.send(str);
             connection.end();
