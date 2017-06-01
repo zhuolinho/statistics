@@ -21,6 +21,7 @@ router.get('/', function (req, res, next) {
         A1452043867650CF41BBEC7689753E10DF64BF31C2593E: ["驰骋新苑", "郑元康"],
         A14528223284070C192C3A7F823D544357794BFF2F5E03: ["阳曲小区", "郑元康"],
         A14587101689224DCBF2DEB1EB8BB6AA8A4E9B63CA63D6: ["演示小区", "测试账号_物业"],
+        A1458784787046C9806B52B58C1F7E72CE7C17BBB95F07: ["士韵家园（南区）", "陈丽丽"],
         A145880699053916CCB72A6B656D6CC62EB721A78A7F84: ["桂杨园", "吴慧谦"],
         A1460604502348A10C7A1D7920CE92718663AA4AEBD4BA: ["闻喜路251弄小区", "郑元康"],
         A14624162381561CB5339887732C293B6D4C0CBC92EFA7: ["南溪园", "吴慧谦"],
@@ -35,11 +36,13 @@ router.get('/', function (req, res, next) {
         A147028331709692825A19AF39D15CA5E12D677E7EC5E0: ["中怡家园", "吴慧谦"],
         A1471844624229F1C83FFD8C9A1CC7368539C733123D9B: ["彭五小区自营", "郑元康"],
         A1472435786399216508E070813F9602BA3E88AB054BFD: ["田林十四村多层", "王佳"],
+        A147322906459773C36FD710D217D633D5FA158495BC8C: ["光鸿苑", "陈丽丽"],
         A1473394879172B0F718B0521E47DF3CC3201800C311B5: ["平顺小区", "郑元康"],
         A147632132540938C40DC802375E259E809C9D813D110D: ["海富公寓", "董凯敏"],
         A14812474052785291A7D4FBD1E232EE11C40C1E2F6577: ["三泉路424弄", "郑元康"],
         A14887792121510D4E9D588BD9E6467D60FEF3339E7DBA: ["闻喜路1110弄", "郑元康"],
         A148904589353610C8823DDDC4ED7151700B3492A18815: ["闻喜小区", "郑元康"],
+        A1490960450517F8F493E132D552487E07D0969E3B6D74: ["泉灵小区", "郑元康"],
         A1432783133629C72746BBA6A29BD9522BC75911678002: ["光新大楼", "吴慧谦"],
         A14332304496799618D405DF8B5B811C98D330C6E1A5B1: ["兰田大楼", "吴慧谦"],
         A1439431528982D5E19B4981A017C888FF974458A68898: ["航天新苑", "陈丽丽"],
@@ -71,13 +74,13 @@ router.get('/', function (req, res, next) {
         // database : 'image'
     });
     connection.connect();
-    connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-01-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
+    connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
         if (error) throw error;
         var orders = {};
         results.forEach(function (order) {
             orders[order.park_id] = order;
         });
-        connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time BETWEEN '2016-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
+        connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额\n";
             results.forEach(function (trade) {
@@ -89,7 +92,7 @@ router.get('/', function (req, res, next) {
                 }
             });
             for (var key in orders) {
-                str = str + key + '","';
+                str = str + key + "," +orders[key][0];
             }
             res.send(str);
             connection.end();
