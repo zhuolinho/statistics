@@ -71,14 +71,15 @@ router.get('/', function (req, res, next) {
         // database : 'image'
     });
     connection.connect();
-    connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
+    connection.query("SELECT park_id, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
+
         if (error) throw error;
         var orders = {};
         results.forEach(function (order) {
             orders[order.park_id] = order;
         });
         // res.send(orders);
-        connection.query("SELECT park_id, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
+        connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-29' AND '2017-06-05' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额\n";
             results.forEach(function (trade) {
