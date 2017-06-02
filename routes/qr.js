@@ -40,6 +40,7 @@ router.get('/', function (req, res, next) {
                 });
                 res.send(str);
                 connection.end();
+                querying = false;
             });
         });
     }
