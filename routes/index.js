@@ -82,7 +82,6 @@ router.get('/', function (req, res, next) {
         });
         connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time BETWEEN '2017-05-29' AND '2017-06-05' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
-            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额\n";
             results.forEach(function (trade) {
                 if (orders[trade.park_id]) {
                     orders[trade.park_id].c = trade.c;
@@ -91,6 +90,7 @@ router.get('/', function (req, res, next) {
                     orders[trade.park_id] = trade;
                 }
             });
+            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
             for (var key in orders) {
                 if (!orders[key].count) {
                     orders[key].count = 0;
@@ -100,9 +100,9 @@ router.get('/', function (req, res, next) {
                     orders[key].c = 0;
                     orders[key].s = 0;
                 }
-                str = str + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s) + "\n";
+                str = str + "\n" + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
             }
-            res.send(orders);
+            res.send(str);
             connection.end();
         });
     });
