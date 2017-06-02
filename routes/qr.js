@@ -64,7 +64,7 @@ router.get('/', function (req, res, next) {
         // database : 'image'
     });
     connection.connect();
-    connection.query("SELECT client_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-29' AND '2017-06-05' AND order_category = 'QR' AND ispay = 'Y' AND STATUS = 'R' GROUP BY client_id", function (error, results, fields) {
+    connection.query("SELECT client_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-05-01' AND '2017-06-01' AND order_category = 'QR' AND ispay = 'Y' AND STATUS = 'R' GROUP BY client_id", function (error, results, fields) {
         if (error) throw error;
         var orders = {};
         results.forEach(function (order) {
@@ -79,7 +79,7 @@ router.get('/', function (req, res, next) {
                     count = orders[trade.client_id].count;
                     sum = orders[trade.client_id].sum;
                 }
-                str = str + "\n" + parkInfo[park_id][0] + "," + trade.client_id + "," + trade.name + "," + trade.phone + "," + count + "," + sum + "," + (trade.c + count) + "," + (sum - trade.s);
+                str = str + "\n" + parkInfo[trade.park_id][0] + "," + trade.client_id + "," + trade.name + "," + trade.phone + "," + count + "," + sum + "," + (trade.c + count) + "," + (sum - trade.s);
             });
             res.send(str);
             connection.end();
