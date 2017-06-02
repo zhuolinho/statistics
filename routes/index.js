@@ -91,7 +91,6 @@ router.get('/', function (req, res, next) {
                     orders[trade.park_id] = trade;
                 }
             });
-            res.send(orders);
             for (var key in orders) {
                 if (!orders[key].count) {
                     orders[key].count = 0;
@@ -103,6 +102,7 @@ router.get('/', function (req, res, next) {
                 }
                 str = str + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s) + "\n";
             }
+            res.send(orders);
             connection.end();
         });
     });
