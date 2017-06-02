@@ -46,7 +46,7 @@ router.get('/', function (req, res, next) {
         A1432783133629C72746BBA6A29BD9522BC75911678002: ["光新大楼", "吴慧谦"],
         A14332304496799618D405DF8B5B811C98D330C6E1A5B1: ["兰田大楼", "吴慧谦"],
         A1439431528982D5E19B4981A017C888FF974458A68898: ["航天新苑", "陈丽丽"],
-        A1440040917602728B8936E303067F35FEFA53FC77B7FA: ["和乐苑,焦其琛"],
+        A1440040917602728B8936E303067F35FEFA53FC77B7FA: ["和乐苑", "焦其琛"],
         A14503260351636D8FB8DD77E3A96DE1F0A87ADE38B98C: ["临汾街道（岭南路270弄）", "郑元康"],
         A1450343729077CFECCDDF312E6A108BAA2DE95C4330E8: ["陆一小区", "郑元康"],
         A14576631270104D17E264EA83D2CE153869729BBAECA4: ["普陀一村", "郑元康"],
@@ -91,6 +91,7 @@ router.get('/', function (req, res, next) {
                     orders[trade.park_id] = trade;
                 }
             });
+            res.send(orders);
             for (var key in orders) {
                 if (!orders[key].count) {
                     orders[key].count = 0;
@@ -102,7 +103,6 @@ router.get('/', function (req, res, next) {
                 }
                 str = str + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s) + "\n";
             }
-            res.send(orders);
             connection.end();
         });
     });
