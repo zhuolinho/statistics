@@ -92,7 +92,15 @@ router.get('/', function (req, res, next) {
                 }
             });
             for (var key in orders) {
-                str = str + key + "," + parkInfo[key][0];
+                if (!orders[key].count) {
+                    orders[key].count = 0;
+                    orders[key].sum = 0;
+                }
+                if (!orders[key].c) {
+                    orders[key].c = 0;
+                    orders[key].s = 0;
+                }
+                str = str + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s) + "\n";
             }
             res.send(str);
             connection.end();
