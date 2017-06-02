@@ -32,7 +32,7 @@ router.get('/', function (req, res, next) {
                     count = orders[trade.client_id].count;
                     sum = orders[trade.client_id].sum;
                 }
-                str = str + "\n" + parkInfo[trade.park_id][0] + "," + trade.client_id + "," + trade.name + "," + trade.phone + "," + count + "," + sum + "," + (trade.c + count) + "," + (sum - trade.s);
+                str = str + "\n" + trade.name + "," + trade.client_id + "," + trade.name + "," + trade.phone + "," + count + "," + sum + "," + (trade.c + count) + "," + (sum - trade.s);
             });
             res.send(str);
             connection.end();
