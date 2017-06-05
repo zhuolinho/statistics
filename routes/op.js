@@ -37,8 +37,11 @@ router.get('/', function (req, res, next) {
                         orders[trade.park_id] = trade;
                     }
                 });
-                res.send(orders);
-                var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
+                var str = "";
+                for (var key in orders) {
+                    str += '"' + key + '",'
+                }
+                res.send(str);
                 connection.end();
                 querying = false;
             });
