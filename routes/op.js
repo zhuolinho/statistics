@@ -6,6 +6,7 @@ var mysql = require('mysql');
 var router = express.Router();
 var querying = false;
 var parkInfo = {
+    A1493187454575F2B58F8A1A78A841FC8DC05FE1A4085F: ["", ""],
     A14768476481206B95E8AAE1D829C4506C0B413369E626: ["华东医院", "王佳"],
     A1439432767348FB60483788AA86862F8D6E1DA99BB6ED: ["长桥四村", "王佳"],
     A1440040917602728B8936E303067F35FEFA53FC77B7FA: ["和乐苑", "焦其琛"],
