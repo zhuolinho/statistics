@@ -88,6 +88,7 @@ router.get('/', function (req, res, next) {
                 });
                 var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
                 for (var key in orders) {
+                    console.log(key);
                     if (!orders[key].count) {
                         orders[key].count = 0;
                         orders[key].sum = 0;
