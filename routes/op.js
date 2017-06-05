@@ -25,7 +25,7 @@ router.get('/', function (req, res, next) {
             if (error) throw error;
             var orders = {};
             results.forEach(function (order) {
-                orders[order.id] = order;
+                orders[order.park_id] = order;
             });
             connection.query("SELECT a.park_id, b.name, a.c, a.s FROM (SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND TYPE = 'CONSUME' GROUP BY park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id", function (error, results, fields) {
                 if (error) throw error;
@@ -38,6 +38,7 @@ router.get('/', function (req, res, next) {
                     }
                 });
                 res.send(orders);
+                var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
                 connection.end();
                 querying = false;
             });
