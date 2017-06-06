@@ -76,7 +76,7 @@ function getInfo(db, index, keys, arr, done) {
                 parkId: doc._id,
                 isDiscard: 'N'
             }, function (err, doc) {
-                db.getCollection('conch_ConchUser').findOne({_id: doc.conchUserId}, function (err, doc) {
+                db.collection('conch_ConchUser').findOne({_id: doc.conchUserId}, function (err, doc) {
                     arr[key] = doc;
                     getInfo(db, index + 1, keys, arr, done);
                 });
