@@ -55,15 +55,15 @@ var querying = false;
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    // MongoClient.connect(DB_CONN_STR, function (err, db) {
-    //     var arr = {};
-    //     db.collection('conch_ChargeAppealSum').find({periodType: 'MONTH'}).forEach(function (doc) {
-    //         arr[doc._id] = doc;
-    //         console.log(doc);
-    //     });
-    //     res.send(arr);
-    //     db.close();
-    // });
+    MongoClient.connect(DB_CONN_STR, function (err, db) {
+        var arr = {};
+        db.collection('conch_ChargeAppealSum').find({periodType: 'MONTH'}).forEach(function (doc) {
+            arr[doc._id] = doc;
+            console.log(doc);
+        });
+        res.send(arr);
+        db.close();
+    });
     if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") res.send("querying...");
     else {
         querying = true;
