@@ -55,7 +55,7 @@ var querying = false;
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    if (querying || req.connection.remoteAddress.split(":")[3] == "211.161.198.70") {
+    if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") {
         res.send("querying...");
     }
     else {
