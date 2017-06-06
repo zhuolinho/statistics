@@ -55,16 +55,9 @@ var querying = false;
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    MongoClient.connect(DB_CONN_STR, function (err, db) {
-        var arr = {};
-        db.collection('conch_ChargeAppealSum').find({periodType: 'MONTH'}).forEach(function (doc) {
-            arr[doc._id] = doc;
-            console.log(doc);
-        });
-        res.send(arr);
-        db.close();
-    });
-    if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") res.send("querying...");
+    if (querying || req.connection.remoteAddress.split(":")[3] == "211.161.198.70") {
+        res.send("querying...");
+    }
     else {
         querying = true;
         var connection = mysql.createConnection({
@@ -104,14 +97,25 @@ router.get('/', function (req, res, next) {
                         orders[key].c = 0;
                         orders[key].s = 0;
                     }
-                    str = str + "\n" + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                    // str = str + "\n" + key + "," + parkInfo[key][0] + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
                 }
-                res.send(str);
+                var keys = Object.keys(orders);
+                MongoClient.connect(DB_CONN_STR, function (err, db) {
+                    getInfo(db, 0, keys, function (obj) {
+                        res.send(obj);
+                    });
+                    db.close();
+                });
                 connection.end();
                 querying = false;
             });
         });
     }
 });
+
+function getInfo(db, index, keys, callback) {
+    var obj = db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'});
+    callback(obj);
+}
 
 module.exports = router;
