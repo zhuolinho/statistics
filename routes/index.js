@@ -116,6 +116,7 @@ router.get('/', function (req, res, next) {
 
 function getInfo(db, index, keys, next) {
     if (keys[index]) {
+        console.log(keys[index]);
         db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'}, function (err, doc) {
             next(doc);
             getInfo(db, index + 1, keys, next);
