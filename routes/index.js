@@ -114,8 +114,9 @@ router.get('/', function (req, res, next) {
 });
 
 function getInfo(db, index, keys, callback) {
-    var obj = db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'});
-    callback(obj);
+    db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'},function (res) {
+        callback(res);
+    });
 }
 
 module.exports = router;
