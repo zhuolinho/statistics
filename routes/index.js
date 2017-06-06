@@ -102,10 +102,11 @@ router.get('/', function (req, res, next) {
                 var keys = Object.keys(orders);
                 MongoClient.connect(DB_CONN_STR, function (err, db) {
                     getInfo(db, 0, keys, function (obj) {
-                        res.send(obj);
+                        console.log(obj);
                     });
                     db.close();
                 });
+                res.send();
                 connection.end();
                 querying = false;
             });
@@ -113,10 +114,13 @@ router.get('/', function (req, res, next) {
     }
 });
 
-function getInfo(db, index, keys, callback) {
-    db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'},function (res) {
-        callback(res);
-    });
+function getInfo(db, index, keys, next) {
+    if (keys[index]) {
+        db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'}, function (err, doc) {
+            next(doc);
+            getInfo(db, index + 1, keys, next);
+        });
+    }
 }
 
 module.exports = router;
