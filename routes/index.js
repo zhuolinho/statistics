@@ -71,13 +71,14 @@ function getInfo(db, index, keys, arr, done) {
     var key = keys[index];
     if (key) {
         db.collection('conch_ParkBasic').findOne({lmd_parkId: key, isDiscard: 'N'}, function (err, doc) {
+            arr[key].parkName = doc.parkName;
             db.collection('conch_ParkUser').findOne({
                 parkRole: 'PM',
                 parkId: doc._id,
                 isDiscard: 'N'
             }, function (err, doc) {
                 db.collection('conch_ConchUser').findOne({_id: doc.conchUserId}, function (err, doc) {
-                    arr[key] = doc;
+                    arr[key].name = doc.name;
                     getInfo(db, index + 1, keys, arr, done);
                 });
             });
