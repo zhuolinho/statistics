@@ -70,6 +70,7 @@ router.get('/', function (req, res, next) {
 function getInfo(db, index, keys, arr, done) {
     var key = keys[index];
     if (key) {
+        arr[key] = {};
         db.collection('conch_ParkBasic').findOne({lmd_parkId: key, isDiscard: 'N'}, function (err, doc) {
             arr[key].parkName = doc.parkName;
             db.collection('conch_ParkUser').findOne({
