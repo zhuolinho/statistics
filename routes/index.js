@@ -46,22 +46,22 @@ router.get('/', function (req, res, next) {
                 MongoClient.connect(DB_CONN_STR, function (err, db) {
                     getInfo(db, 0, keys, parkInfo, function () {
                         db.close();
-                        res.send(parkInfo);
+                        querying = false;
+                        var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
+                        for (var key in orders) {
+                            if (!orders[key].count) {
+                                orders[key].count = 0;
+                                orders[key].sum = 0;
+                            }
+                            if (!orders[key].c) {
+                                orders[key].c = 0;
+                                orders[key].s = 0;
+                            }
+                            str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                        }
+                        res.send(str);
                     });
                 });
-                querying = false;
-                var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
-                for (var key in orders) {
-                    if (!orders[key].count) {
-                        orders[key].count = 0;
-                        orders[key].sum = 0;
-                    }
-                    if (!orders[key].c) {
-                        orders[key].c = 0;
-                        orders[key].s = 0;
-                    }
-                    str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
-                }
             });
         });
     }
