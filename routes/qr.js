@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
     else {
         querying = true;
         var connection = mysql.createConnection({
-            host: 'rr-bp1hlg1jno22041z2.mysql.rds.aliyuncs.com',
+            host: 'rr-bp16k64rx4lk50917.mysql.rds.aliyuncs.com',
             user: 'tcc',
             password: 'thinkLight',
             database: 'tcc'
