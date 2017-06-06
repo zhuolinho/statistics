@@ -103,8 +103,9 @@ router.get('/', function (req, res, next) {
                 MongoClient.connect(DB_CONN_STR, function (err, db) {
                     getInfo(db, 0, keys, function (obj) {
                         console.log(obj);
+                    }, function () {
+                        db.close();
                     });
-                    db.close();
                 });
                 res.send();
                 connection.end();
@@ -114,13 +115,15 @@ router.get('/', function (req, res, next) {
     }
 });
 
-function getInfo(db, index, keys, next) {
+function getInfo(db, index, keys, next, done) {
     if (keys[index]) {
         console.log(keys[index]);
         db.collection('conch_ParkBasic').findOne({lmd_parkId: keys[index], isDiscard: 'N'}, function (err, doc) {
             next(doc);
-            getInfo(db, index + 1, keys, next);
+            getInfo(db, index + 1, keys, next, done);
         });
+    } else {
+        done();
     }
 }
 
