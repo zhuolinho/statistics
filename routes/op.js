@@ -84,7 +84,7 @@ router.get('/', function (req, res, next) {
                             db.close();
                             querying = false;
                             result.forEach(function (obj) {
-                                if (parkInfo[obj.lmd_parkId]) res.send(obj);
+                                if (parkInfo[obj.lmd_parkId]) console.log(obj.lmd_parkId);
                                 else parkInfo[obj.lmd_parkId] = obj;
                             });
                             res.send(parkInfo);
