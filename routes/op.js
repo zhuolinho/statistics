@@ -10,7 +10,7 @@ var DB_CONN_STR = 'mongodb://tcc:mdao_thinklight_1314@dds-bp1e6f25461e0b041.mong
 var querying = false;
 
 router.get('/', function (req, res, next) {
-    if (querying || req.connection.remoteAddress.split(":")[3] == "211.161.198.70") res.send("querying...");
+    if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") res.send("querying...");
     else {
         querying = true;
         var connection = mysql.createConnection({
@@ -40,20 +40,6 @@ router.get('/', function (req, res, next) {
                         orders[trade.park_id] = trade;
                     }
                 });
-                // var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
-                // for (var key in orders) {
-                //     console.log(key);
-                //     if (!orders[key].count) {
-                //         orders[key].count = 0;
-                //         orders[key].sum = 0;
-                //     }
-                //     if (!orders[key].c) {
-                //         orders[key].c = 0;
-                //         orders[key].s = 0;
-                //     }
-                //     str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
-                // }
-                // res.send(str);
                 connection.end();
                 var keys = Object.keys(orders);
                 var parkInfo = {};
@@ -83,10 +69,23 @@ router.get('/', function (req, res, next) {
                         }, {$match: {isDiscard: "N"}}],function (err, result) {
                             res.send(result);
                             db.close();
+                            querying = false;
+                            var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
+                            for (var key in orders) {
+                                console.log(key);
+                                if (!orders[key].count) {
+                                    orders[key].count = 0;
+                                    orders[key].sum = 0;
+                                }
+                                if (!orders[key].c) {
+                                    orders[key].c = 0;
+                                    orders[key].s = 0;
+                                }
+                                str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                            }
                         })
                     });
                 });
-                querying = false;
             });
         });
     }
