@@ -81,9 +81,13 @@ router.get('/', function (req, res, next) {
                                 as: "projectInfo"
                             }
                         }, {$match: {lmd_parkId: {$ne: null, $exists: true}, isDiscard: "N"}}], function (err, result) {
-                            res.send(result);
                             db.close();
                             querying = false;
+                            result.forEach(function (obj) {
+                                if (parkInfo[obj.lmd_parkId]) res.send(obj);
+                                else parkInfo[obj.lmd_parkId] = obj;
+                            });
+                            res.send(parkInfo);
                         })
                     });
                 });
