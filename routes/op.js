@@ -14,14 +14,14 @@ router.get('/', function (req, res, next) {
     else {
         querying = true;
         var connection = mysql.createConnection({
-            // host: 'rr-bp16k64rx4lk50917.mysql.rds.aliyuncs.com',
-            // user: 'tcc_query',
-            // password: 'querythinkLight123',
-            // database: 'tcc'
-            host     : '54.222.179.73',
-            user     : 'image',
-            password : 'image@thinkLight',
-            database : 'image'
+            host: 'rr-bp16k64rx4lk50917.mysql.rds.aliyuncs.com',
+            user: 'tcc_query',
+            password: 'querythinkLight123',
+            database: 'tcc'
+            // host     : '54.222.179.73',
+            // user     : 'image',
+            // password : 'image@thinkLight',
+            // database : 'image'
         });
         connection.connect();
         connection.query("SELECT a.park_id, b.name, a.count, a.sum FROM (SELECT park_id, COUNT(*) AS COUNT, SUM(actual_fee) AS SUM FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND order_category = 'OP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id", function (error, results, fields) {
@@ -40,6 +40,20 @@ router.get('/', function (req, res, next) {
                         orders[trade.park_id] = trade;
                     }
                 });
+                // var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
+                // for (var key in orders) {
+                //     console.log(key);
+                //     if (!orders[key].count) {
+                //         orders[key].count = 0;
+                //         orders[key].sum = 0;
+                //     }
+                //     if (!orders[key].c) {
+                //         orders[key].c = 0;
+                //         orders[key].s = 0;
+                //     }
+                //     str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                // }
+                // res.send(str);
                 connection.end();
                 var keys = Object.keys(orders);
                 var parkInfo = {};
@@ -51,7 +65,7 @@ router.get('/', function (req, res, next) {
                             foreignField: "_id",
                             as: "userInfo"
                         }
-                    }, {$out: "user"}],function (err, result) {
+                    }, {$out: "user"}], function (err, result) {
                         db.collection('user').aggregate([{
                             $lookup: {
                                 from: "user",
@@ -66,23 +80,10 @@ router.get('/', function (req, res, next) {
                                 foreignField: "paramter.parkBasic._id",
                                 as: "projectInfo"
                             }
-                        }, {$match: {isDiscard: "N"}}],function (err, result) {
+                        }, {$match: {lmd_parkId: {$ne: null, $exists: true}, isDiscard: "N"}}], function (err, result) {
                             res.send(result);
                             db.close();
                             querying = false;
-                            var str = "park_id,场库,合伙人,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
-                            for (var key in orders) {
-                                console.log(key);
-                                if (!orders[key].count) {
-                                    orders[key].count = 0;
-                                    orders[key].sum = 0;
-                                }
-                                if (!orders[key].c) {
-                                    orders[key].c = 0;
-                                    orders[key].s = 0;
-                                }
-                                str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key][1] + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
-                            }
                         })
                     });
                 });
