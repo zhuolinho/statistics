@@ -106,9 +106,9 @@ router.get('/', function (req, res, next) {
                             var pm = "";
                             var needAmount = "";
                             doc.forEach(function (obj) {
-                                if (obj.userInfo[0]) pm = obj.userInfo[0].name;
+                                if (obj.userInfo[0] && !pm) pm = obj.userInfo[0].name;
                                 obj.projectInfo.forEach(function (ele) {
-                                    needAmount += ele.needAmount;
+                                    if (needAmount != "Y") needAmount = ele.needAmount;
                                 });
                             });
                             parkInfo[key] = {pm: pm, needAmount: needAmount};
