@@ -88,7 +88,7 @@ router.get('/', function (req, res, next) {
                                     $filter: {
                                         input: "$pmInfo",
                                         as: "pm",
-                                        cond: {$and: [{$eq: ["$$pm.isDiscard", 'Y']}, {$eq: ["$$pm.parkRole", "PM"]}]}
+                                        cond: {$and: [{$eq: ["$$pm.isDiscard", 'N']}, {$eq: ["$$pm.parkRole", "PM"]}]}
                                     }
                                 }
                             }
