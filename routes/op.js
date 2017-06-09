@@ -105,7 +105,7 @@ router.get('/', function (req, res, next) {
                         // if (doc.length) {
                         //     parkInfo[key] = doc[0];
                         // } else {
-                            parkInfo[key] = doc.length;
+                            parkInfo[key] = doc;
                         // }
                     }
                     querying = false;
