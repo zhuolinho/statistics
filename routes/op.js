@@ -59,8 +59,9 @@ router.get('/', function (req, res, next) {
                 var parkInfo = {};
                 co(function*() {
                     var db = yield MongoClient.connect(DB_CONN_STR);
+                    // var keys = ["051f8968-a497-4a1e-90fc-461e739075de", "A14364339555198B0A8DC8757B1E97F63AFE5C0B60CAB7", "A14799531829431CC1172F30415774A79D2CC02C131025", "A1409734578950DFDF21E7FD13B0C21C9D80EB91831DFE", "A1409734327205384BED524595139E428F616EC59F8C5E", "A1400229753243993D1A5C52AC1F56ADDC3D0A8B437708", "A14327963443665CBAA4A3A93A5BDBDCF0E9B2156FF48F", "A142310322837451A40CB69F64A4FD66A10719CCE9ECD2"];
                     for (var key in orders) {
-                        var cursor = db.collection("conch_ParkBasic").aggregate({
+                        var cursor = db.collection("conch_ParkBasic").aggregate([{
                             $match: {
                                 lmd_parkId: key,
                                 isDiscard: "N"
@@ -99,10 +100,18 @@ router.get('/', function (req, res, next) {
                                 foreignField: "_id",
                                 as: "userInfo"
                             }
-                        });
+                        }]);
                         var doc = yield cursor.toArray();
                         if (doc.length) {
-                            parkInfo[key] = doc[0];
+                            var pm = "";
+                            var needAmount = "";
+                            doc.forEach(function (obj) {
+                                if (obj.userInfo[0]) pm = obj.userInfo[0].name;
+                                obj.projectInfo.forEach(function (ele) {
+                                    needAmount += ele.needAmount;
+                                });
+                            });
+                            parkInfo[key] = {pm: pm, needAmount: needAmount};
                         } else {
                             parkInfo[key] = {};
                         }
