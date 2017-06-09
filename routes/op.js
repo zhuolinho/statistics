@@ -60,7 +60,7 @@ router.get('/', function (req, res, next) {
                 co(function*() {
                     var db = yield MongoClient.connect(DB_CONN_STR);
                     for (var key in orders) {
-                        var cursor = db.collection("conch_ParkBasic").aggregate([{
+                        var cursor = db.collection("conch_ParkBasic").aggregate({
                             $match: {
                                 lmd_parkId: key,
                                 isDiscard: "N"
@@ -99,14 +99,13 @@ router.get('/', function (req, res, next) {
                                 foreignField: "_id",
                                 as: "userInfo"
                             }
-                        }
-                        ]);
+                        });
                         var doc = yield cursor.toArray();
-                        // if (doc.length) {
-                        //     parkInfo[key] = doc[0];
-                        // } else {
-                            parkInfo[key] = doc;
-                        // }
+                        if (doc.length) {
+                            parkInfo[key] = doc[0];
+                        } else {
+                            parkInfo[key] = {};
+                        }
                     }
                     querying = false;
                     res.send(parkInfo);
