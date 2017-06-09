@@ -8,6 +8,7 @@ var MongoClient = require('mongodb').MongoClient;
 // var DB_CONN_STR = 'mongodb://tcc:tcc@image.limadcw.com:27017/tcc';
 var DB_CONN_STR = 'mongodb://tcc:mdao_thinklight_1314@dds-bp1e6f25461e0b041.mongodb.rds.aliyuncs.com:3717/tcc';
 var querying = false;
+var co = require('co');
 
 router.get('/', function (req, res, next) {
     if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") res.send("querying...");
@@ -55,23 +56,14 @@ router.get('/', function (req, res, next) {
                 // }
                 // res.send(str);
                 connection.end();
-                var keys = Object.keys(orders);
                 var parkInfo = {};
-                MongoClient.connect(DB_CONN_STR, function (err, db) {
-                    db.collection('conch_ParkUser').aggregate([{$match: {isDiscard: "N", parkRole: "PM"}}, {
-                        $lookup: {
-                            from: "conch_ConchUser",
-                            localField: "conchUserId",
-                            foreignField: "_id",
-                            as: "userInfo"
-                        }
-                    }, {$out: "user"}], function (err, result) {
-                        db.collection('conch_ParkBasic').aggregate([{
-                            $lookup: {
-                                from: "user",
-                                localField: "_id",
-                                foreignField: "parkId",
-                                as: "pmInfo"
+                co(function*() {
+                    var db = yield MongoClient.connect(DB_CONN_STR);
+                    for (var key in orders) {
+                        var cursor = db.collection("conch_ParkBasic").aggregate([{
+                            $match: {
+                                lmd_parkId: key,
+                                isDiscard: "N"
                             }
                         }, {
                             $lookup: {
@@ -80,16 +72,44 @@ router.get('/', function (req, res, next) {
                                 foreignField: "paramter.parkBasic._id",
                                 as: "projectInfo"
                             }
-                        }, {$match: {lmd_parkId: {$ne: null, $exists: true}, isDiscard: "N"}}], function (err, result) {
-                            db.close();
-                            querying = false;
-                            result.forEach(function (obj) {
-                                if (parkInfo[obj.lmd_parkId]) console.log(obj.lmd_parkId);
-                                else parkInfo[obj.lmd_parkId] = obj;
-                            });
-                            res.send(parkInfo);
-                        })
-                    });
+                        }, {
+                            $lookup: {
+                                from: "conch_ParkUser",
+                                localField: "_id",
+                                foreignField: "parkId",
+                                as: "pmInfo"
+                            }
+                        }, {
+                            $project: {
+                                projectInfo: 1,
+                                parkName: 1,
+                                lmd_parkId: 1,
+                                pmInfo: {
+                                    $filter: {
+                                        input: "$pmInfo",
+                                        as: "pm",
+                                        cond: {$and: [{$eq: ["$$pm.isDiscard", 'Y']}, {$eq: ["$$pm.parkRole", "PM"]}]}
+                                    }
+                                }
+                            }
+                        }, {$unwind: {path: "$pmInfo", preserveNullAndEmptyArrays: true}}, {
+                            $lookup: {
+                                from: "conch_ConchUser",
+                                localField: "pmInfo.conchUserId",
+                                foreignField: "_id",
+                                as: "userInfo"
+                            }
+                        }
+                        ]);
+                        var doc = yield cursor.toArray();
+                        if (doc.length) {
+                            parkInfo[key] = doc[0];
+                        } else {
+                            parkInfo[key] = {};
+                        }
+                    }
+                    querying = false;
+                    res.send(parkInfo);
                 });
             });
         });
