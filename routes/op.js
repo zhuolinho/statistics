@@ -102,11 +102,11 @@ router.get('/', function (req, res, next) {
                         }
                         ]);
                         var doc = yield cursor.toArray();
-                        if (doc.length) {
-                            parkInfo[key] = doc[0];
-                        } else {
-                            parkInfo[key] = {};
-                        }
+                        // if (doc.length) {
+                        //     parkInfo[key] = doc[0];
+                        // } else {
+                            parkInfo[key] = doc.length;
+                        // }
                     }
                     querying = false;
                     res.send(parkInfo);
