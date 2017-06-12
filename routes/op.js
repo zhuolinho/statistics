@@ -24,7 +24,7 @@ router.get('/', function (req, res, next) {
             // password : 'image@thinkLight',
             // database : 'image'
         });
-        connection.connect();
+        // connection.connect();
         connection.query("SELECT a.park_id, b.name, a.count, a.sum FROM (SELECT park_id, COUNT(*) AS COUNT, SUM(actual_fee) AS SUM FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND order_category = 'OP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id", function (error, results, fields) {
             if (error) throw error;
             var orders = {};
@@ -42,10 +42,9 @@ router.get('/', function (req, res, next) {
                     }
                 });
                 connection.end();
-                var parkInfo = {};
                 co(function*() {
                     var db = yield MongoClient.connect(DB_CONN_STR);
-                    // var keys = ["051f8968-a497-4a1e-90fc-461e739075de", "A14364339555198B0A8DC8757B1E97F63AFE5C0B60CAB7", "A14799531829431CC1172F30415774A79D2CC02C131025", "A1409734578950DFDF21E7FD13B0C21C9D80EB91831DFE", "A1409734327205384BED524595139E428F616EC59F8C5E", "A1400229753243993D1A5C52AC1F56ADDC3D0A8B437708", "A14327963443665CBAA4A3A93A5BDBDCF0E9B2156FF48F", "A142310322837451A40CB69F64A4FD66A10719CCE9ECD2"];
+                    var parkInfo = {};
                     for (var key in orders) {
                         var cursor = db.collection("conch_ParkBasic").aggregate([{
                             $match: {
