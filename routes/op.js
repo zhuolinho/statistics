@@ -99,7 +99,7 @@ router.get('/', function (req, res, next) {
                             });
                             parkInfo[key] = {pm: pm, needAmount: needAmount};
                         } else {
-                            parkInfo[key] = {};
+                            parkInfo[key] = {pm2: "", needAmount: ""};
                         }
                     }
                     db.close();
@@ -115,7 +115,7 @@ router.get('/', function (req, res, next) {
                             orders[key].c = 0;
                             orders[key].s = 0;
                         }
-                        str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key].pm + "," + parkInfo[key].needAmount +  "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                        str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key].pm + "," + parkInfo[key].needAmount + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
                     }
                     res.send(str);
                 });
