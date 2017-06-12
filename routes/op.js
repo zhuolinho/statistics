@@ -104,22 +104,21 @@ router.get('/', function (req, res, next) {
                     }
                     db.close();
                     querying = false;
-                    // res.send(parkInfo);
+                    var str = "park_id,场库,合伙人,是否自营,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
+                    for (var key in orders) {
+                        console.log(key);
+                        if (!orders[key].count) {
+                            orders[key].count = 0;
+                            orders[key].sum = 0;
+                        }
+                        if (!orders[key].c) {
+                            orders[key].c = 0;
+                            orders[key].s = 0;
+                        }
+                        str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key].pm + "," + parkInfo[key].needAmount +  "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                    }
+                    res.send(str);
                 });
-                var str = "park_id,场库,合伙人,是否自营,临停线上支付笔数,临停线上支付金额,临停总笔数,临停总金额";
-                for (var key in orders) {
-                    console.log(key);
-                    if (!orders[key].count) {
-                        orders[key].count = 0;
-                        orders[key].sum = 0;
-                    }
-                    if (!orders[key].c) {
-                        orders[key].c = 0;
-                        orders[key].s = 0;
-                    }
-                    str = str + "\n" + key + "," + orders[key].name + "," + parkInfo[key].pm + "," + parkInfo[key].needAmount +  "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
-                }
-                res.send(str);
             });
         });
     }
