@@ -99,7 +99,7 @@ router.get('/', function (req, res, next) {
                             });
                             parkInfo[key] = {pm: pm, needAmount: needAmount};
                         } else {
-                            parkInfo[key] = {pm2: "", needAmount: ""};
+                            parkInfo[key] = {pm: "", needAmount: ""};
                         }
                     }
                     db.close();
