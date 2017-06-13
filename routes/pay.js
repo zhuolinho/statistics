@@ -22,11 +22,12 @@ router.get('/', function (req, res, next) {
             // database : 'image'
         });
         co(function*() {
-            var data = yield query(connection, "SELECT order_category, pay_type, COUNT(*), SUM(actual_fee) FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type");
-            console.log(data);
+            var data = yield query(connection, "SELECT order_category, pay_type, COUNT(*) AS c, SUM(actual_fee) AS s FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type");
+            res.send(data);
+            var trade = yield query(connection, "SELECT park_id, client_id, TYPE, COUNT(*), SUM(price) FROM tb_park_cost_trade WHERE create_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' GROUP BY park_id, type, client_id");
+            console.log(trade);
             connection.end();
             querying = false;
-            res.send('done.');
         });
     }
 });
