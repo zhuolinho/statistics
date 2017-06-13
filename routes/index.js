@@ -23,7 +23,6 @@ router.get('/', function (req, res, next) {
             // password: 'image@thinkLight',
             // database: 'image'
         });
-        connection.connect();
         connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var orders = {};
