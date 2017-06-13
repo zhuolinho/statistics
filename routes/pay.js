@@ -8,7 +8,7 @@ var querying = false;
 var co = require('co');
 
 router.get('/', function (req, res, next) {
-    if (querying || req.connection.remoteAddress.split(":")[3] == "211.161.198.70") res.send("querying...");
+    if (querying || req.connection.remoteAddress.split(":")[3] != "211.161.198.70") res.send("querying...");
     else {
         querying = true;
         var connection = mysql.createConnection({
@@ -22,7 +22,7 @@ router.get('/', function (req, res, next) {
             // database : 'image'
         });
         co(function*() {
-            var data = yield query(connection, "SELECT order_category, pay_type, COUNT(*), SUM(actual_fee) FROM tb_park_charge_order WHERE crt_time BETWEEN '2017-06-01' AND '2017-06-12' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type");
+            var data = yield query(connection, "SELECT order_category, pay_type, COUNT(*), SUM(actual_fee) FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type");
             console.log(data);
             connection.end();
             querying = false;
