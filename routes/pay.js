@@ -22,10 +22,10 @@ router.get('/', function (req, res, next) {
             // database : 'image'
         });
         co(function*() {
-            var data = yield query(connection, "SELECT park_id, order_category, pay_type, COUNT(*) AS c, SUM(actual_fee) AS s FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type, park_id");
-            console.log(data);
-            var trade = yield query(connection, "SELECT park_id, client_id, TYPE, COUNT(*), SUM(price) FROM tb_park_cost_trade WHERE create_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' GROUP BY park_id, type, client_id");
-            res.send(trade);
+            var data = yield query(connection, "SELECT a.park_id, b.name, a.count, a.sum FROM (SELECT park_id, order_category, pay_type, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type, park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id");
+            var trade = yield query(connection, "SELECT a.park_id, b.name, a.count, a.sum FROM (SELECT park_id, client_id, TYPE, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE create_time BETWEEN '" + req.query.startDate + "' AND '" + req.query.endDate + "' GROUP BY park_id, type, client_id) AS a, tb_park_park AS b WHERE a.park_id = b.id");
+            console.log(trade);
+            res.send(data);
             connection.end();
             querying = false;
         });
