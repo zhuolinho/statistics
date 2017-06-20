@@ -1,5 +1,5 @@
 /**
- * Created by sl on 2017/6/12.
+ * Created by sl on 2017/6/19.
  */
 var express = require('express');
 var mysql = require('mysql');
@@ -35,35 +35,23 @@ router.get('/', function (req, res, next) {
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
-                var endDate = formatDate(startTime.setDate(startTime.getDate() + 1), "yyyy-MM-dd hh:mm:ss");
+                var hours = startTime.getHours();
+                var endDate = formatDate(startTime.setHours(hours + 1), "yyyy-MM-dd hh:mm:ss");
                 console.log(endDate);
-                var data = yield query(connection, "SELECT a.park_id, b.name, a.order_category, a.pay_type, a.count, a.sum FROM (SELECT park_id, order_category, pay_type, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE " + condition + "crt_time BETWEEN '" + startDate + "' AND '" + endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type, park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id");
-                var trade = yield query(connection, "SELECT a.park_id, b.name AS park_name, a.client_id, c.name, a.type, a.count, a.sum FROM (SELECT park_id, client_id, type, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE " + condition + "create_time BETWEEN '" + startDate + "' AND '" + endDate + "' GROUP BY park_id, type, client_id) AS a, tb_park_park AS b, tb_park_user AS c WHERE a.park_id = b.id AND a.client_id = c.id");
-                var col = db.collection('STAT_OnlinePay');
+                var data = yield query(connection, "SELECT b.ID, b.cameraname, a.status, a.count, b.park_id, c.name FROM (SELECT cameraid, status, COUNT(*) AS COUNT, park_id FROM tb_park_plate WHERE " + condition + "date_time BETWEEN '" + startDate + "' AND '" + endDate + "' GROUP BY cameraid, status) AS a, tb_park_camera AS b, tb_park_park AS c WHERE a.cameraid = b.ID AND a.park_id = c.id");
+                var col = db.collection('STAT_Camera');
                 for (var i = 0; i < data.length; i++) {
                     var r = yield col.updateMany({
-                        parkId: data[i].park_id,
-                        orderCategory: data[i].order_category,
-                        payType: data[i].pay_type,
-                        time: startDate
-                    }, {
-                        $set: {count: data[i].count, sum: data[i].sum, parkName: data[i].name, updateTime: new Date()},
-                        $setOnInsert: {createTime: new Date()}
-                    }, {upsert: true});
-                }
-                col = db.collection('STAT_OfflinePay');
-                for (var i = 0; i < trade.length; i++) {
-                    var r = yield col.updateMany({
-                        parkId: trade[i].park_id,
-                        clientId: trade[i].client_id,
-                        type: trade[i].type,
+                        cameraId: data[i].ID,
+                        status: data[i].status,
                         time: startDate
                     }, {
                         $set: {
-                            count: trade[i].count,
-                            sum: trade[i].sum,
-                            parkName: trade[i].park_name,
-                            name: trade[i].name,
+                            cameraName: data[i].cameraname,
+                            count: data[i].count,
+                            parkId: data[i].park_id,
+                            parkName: data[i].name,
+                            hours: hours,
                             updateTime: new Date()
                         },
                         $setOnInsert: {createTime: new Date()}
