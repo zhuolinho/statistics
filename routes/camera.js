@@ -9,6 +9,8 @@ var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://tcc:mdao_thinklight_1314@dds-bp1e6f25461e0b041.mongodb.rds.aliyuncs.com:3717/tcc';
 var querying = false;
 var co = require('co');
+var Long = require('mongodb').Long;
+var ObjectID = require('mongodb').ObjectID;
 
 router.get('/', function (req, res, next) {
     var remoteAddress = req.connection.remoteAddress.split(":")[3];
@@ -52,9 +54,14 @@ router.get('/', function (req, res, next) {
                             parkId: data[i].park_id,
                             parkName: data[i].name,
                             hours: hours,
-                            updateTime: new Date()
+                            "info.updatedAt": new Date(), "info.updatedBy": ""
                         },
-                        $setOnInsert: {createTime: new Date()}
+                        $setOnInsert: {
+                            "info.createdAt": new Date(),
+                            "info.createdBy": "",
+                            v: new Long(),
+                            _id: new ObjectID().toHexString()
+                        }
                     }, {upsert: true});
                 }
             }

@@ -9,6 +9,8 @@ var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://tcc:mdao_thinklight_1314@dds-bp1e6f25461e0b041.mongodb.rds.aliyuncs.com:3717/tcc';
 var querying = false;
 var co = require('co');
+var Long = require('mongodb').Long;
+var ObjectID = require('mongodb').ObjectID;
 
 router.get('/', function (req, res, next) {
     var remoteAddress = req.connection.remoteAddress.split(":")[3];
@@ -47,8 +49,19 @@ router.get('/', function (req, res, next) {
                         payType: data[i].pay_type,
                         time: startDate
                     }, {
-                        $set: {count: data[i].count, sum: data[i].sum, parkName: data[i].name, updateTime: new Date()},
-                        $setOnInsert: {createTime: new Date()}
+                        $set: {
+                            count: data[i].count,
+                            sum: data[i].sum,
+                            parkName: data[i].name,
+                            "info.updatedAt": new Date(),
+                            "info.updatedBy": ""
+                        },
+                        $setOnInsert: {
+                            "info.createdAt": new Date(),
+                            "info.createdBy": "",
+                            v: new Long(),
+                            _id: new ObjectID().toHexString()
+                        }
                     }, {upsert: true});
                 }
                 col = db.collection('STAT_OfflinePay');
@@ -64,9 +77,14 @@ router.get('/', function (req, res, next) {
                             sum: trade[i].sum,
                             parkName: trade[i].park_name,
                             name: trade[i].name,
-                            updateTime: new Date()
+                            "info.updatedAt": new Date(), "info.updatedBy": ""
                         },
-                        $setOnInsert: {createTime: new Date()}
+                        $setOnInsert: {
+                            "info.createdAt": new Date(),
+                            "info.createdBy": "",
+                            v: new Long(),
+                            _id: new ObjectID().toHexString()
+                        }
                     }, {upsert: true});
                 }
             }
