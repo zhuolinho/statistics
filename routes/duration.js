@@ -36,6 +36,7 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
+                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
                 var endDate = formatDate(startTime.setDate(startTime.getDate() + 1), "yyyy-MM-dd hh:mm:ss");
                 console.log(endDate);
@@ -48,7 +49,7 @@ router.get('/', function (req, res, next) {
                         var r = yield col.updateMany({
                             parkId: data[i].park_id,
                             costType: data[i].cost_type,
-                            time: startDate,
+                            time: time,
                             parkDuration: j
                         }, {
                             $set: {

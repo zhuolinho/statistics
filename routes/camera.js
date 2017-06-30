@@ -36,6 +36,7 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
+                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
                 var hours = startTime.getHours();
                 var endDate = formatDate(startTime.setHours(hours + 1), "yyyy-MM-dd hh:mm:ss");
@@ -46,7 +47,7 @@ router.get('/', function (req, res, next) {
                     var r = yield col.updateMany({
                         cameraId: data[i].ID,
                         status: data[i].status,
-                        time: startDate
+                        time: time
                     }, {
                         $set: {
                             cameraName: data[i].cameraname,

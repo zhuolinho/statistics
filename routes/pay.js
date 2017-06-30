@@ -36,6 +36,7 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
+                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
                 var endDate = formatDate(startTime.setDate(startTime.getDate() + 1), "yyyy-MM-dd hh:mm:ss");
                 console.log(endDate);
@@ -47,7 +48,7 @@ router.get('/', function (req, res, next) {
                         parkId: data[i].park_id,
                         orderCategory: data[i].order_category,
                         payType: data[i].pay_type,
-                        time: startDate
+                        time: time
                     }, {
                         $set: {
                             count: data[i].count,
@@ -70,7 +71,7 @@ router.get('/', function (req, res, next) {
                         parkId: trade[i].park_id,
                         clientId: trade[i].client_id,
                         type: trade[i].type,
-                        time: startDate
+                        time: time
                     }, {
                         $set: {
                             count: trade[i].count,
