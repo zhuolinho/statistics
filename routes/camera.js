@@ -14,7 +14,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 router.get('/', function (req, res, next) {
     var remoteAddress = req.connection.remoteAddress.split(":")[3];
-    if (querying || remoteAddress != "211.161.198.70" && remoteAddress) res.send("querying...");
+    if (querying || remoteAddress != "211.161.198.70" && remoteAddress) res.send(remoteAddress);
     else {
         querying = true;
         var connection = mysql.createConnection({
