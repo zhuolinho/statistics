@@ -23,42 +23,47 @@ router.get('/', function (req, res, next) {
             // password: 'image@thinkLight',
             // database: 'image'
         });
-        connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
+        connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum, AVG(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY))) AS avg FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var orders = {};
             results.forEach(function (order) {
                 orders[order.park_id] = order;
             });
-            connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time >= '" + req.query.startDate + "' AND create_time < '" + req.query.endDate + "' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
-                if (error) throw error;
-                results.forEach(function (trade) {
-                    if (orders[trade.park_id]) {
-                        orders[trade.park_id].c = trade.c;
-                        orders[trade.park_id].s = trade.s;
-                    } else {
-                        orders[trade.park_id] = trade;
-                    }
+            connection.query("SELECT park_id, COUNT(*) AS fc, SUM(actual_fee) AS fs, AVG(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY))) AS fa FROM (SELECT * FROM tb_park_charge_order WHERE order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id, platenumber) AS a WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' GROUP BY park_id", function (error, results, fields) {
+                results.forEach(function (order) {
+                    console.log(order);
                 });
-                connection.end();
-                var keys = Object.keys(orders);
-                var parkInfo = {};
-                MongoClient.connect(DB_CONN_STR, function (err, db) {
-                    getInfo(db, 0, keys, parkInfo, function () {
-                        db.close();
-                        querying = false;
-                        var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
-                        for (var key in orders) {
-                            if (!orders[key].count) {
-                                orders[key].count = 0;
-                                orders[key].sum = 0;
-                            }
-                            if (!orders[key].c) {
-                                orders[key].c = 0;
-                                orders[key].s = 0;
-                            }
-                            str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time >= '" + req.query.startDate + "' AND create_time < '" + req.query.endDate + "' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
+                    if (error) throw error;
+                    results.forEach(function (trade) {
+                        if (orders[trade.park_id]) {
+                            orders[trade.park_id].c = trade.c;
+                            orders[trade.park_id].s = trade.s;
+                        } else {
+                            orders[trade.park_id] = trade;
                         }
-                        res.send(str);
+                    });
+                    connection.end();
+                    var keys = Object.keys(orders);
+                    var parkInfo = {};
+                    MongoClient.connect(DB_CONN_STR, function (err, db) {
+                        getInfo(db, 0, keys, parkInfo, function () {
+                            db.close();
+                            querying = false;
+                            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
+                            for (var key in orders) {
+                                if (!orders[key].count) {
+                                    orders[key].count = 0;
+                                    orders[key].sum = 0;
+                                }
+                                if (!orders[key].c) {
+                                    orders[key].c = 0;
+                                    orders[key].s = 0;
+                                }
+                                str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                            }
+                            res.send(str);
+                        });
                     });
                 });
             });
