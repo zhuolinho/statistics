@@ -31,7 +31,9 @@ router.get('/', function (req, res, next) {
             });
             connection.query("SELECT park_id, COUNT(*) AS fc, SUM(actual_fee) AS fs, AVG(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY))) AS fa FROM (SELECT * FROM tb_park_charge_order WHERE order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id, platenumber) AS a WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' GROUP BY park_id", function (error, results, fields) {
                 results.forEach(function (order) {
-                    console.log(order);
+                    orders[order.park_id].fc = order.fc;
+                    orders[order.park_id].fs = order.fs;
+                    orders[order.park_id].fa = order.fa;
                 });
                 connection.query("SELECT park_id, COUNT(*) AS c, SUM(price) AS s FROM tb_park_cost_trade WHERE create_time >= '" + req.query.startDate + "' AND create_time < '" + req.query.endDate + "' AND (type = 'SPOTHER' OR type = 'PAYOTHER') GROUP BY park_id", function (error, results, fields) {
                     if (error) throw error;
@@ -50,17 +52,23 @@ router.get('/', function (req, res, next) {
                         getInfo(db, 0, keys, parkInfo, function () {
                             db.close();
                             querying = false;
-                            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,包月总支付笔数,包月总金额";
+                            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,线上包月支付期限,首次使用线上支付包月的笔数,首次使用线上支付包月的金额,首次使用线上包月支付期限,包月总支付笔数,包月总金额";
                             for (var key in orders) {
                                 if (!orders[key].count) {
                                     orders[key].count = 0;
                                     orders[key].sum = 0;
+                                    orders[key].avg = NaN;
                                 }
                                 if (!orders[key].c) {
                                     orders[key].c = 0;
                                     orders[key].s = 0;
                                 }
-                                str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                                if (!orders[key].fc) {
+                                    orders[key].fc = 0;
+                                    orders[key].fs = 0;
+                                    orders[key].fa = NaN;
+                                }
+                                str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + orders[key].avg + "," + orders[key].fc + "," + orders[key].fs + "," + orders[key].fa + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
                             }
                             res.send(str);
                         });
