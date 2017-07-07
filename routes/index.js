@@ -58,6 +58,7 @@ router.get('/', function (req, res, next) {
                                     orders[key].count = 0;
                                     orders[key].sum = 0;
                                     orders[key].avg = NaN;
+                                    orders[key].diff = 0;
                                 }
                                 if (!orders[key].c) {
                                     orders[key].c = 0;
