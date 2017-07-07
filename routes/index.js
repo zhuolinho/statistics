@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
             // password: 'image@thinkLight',
             // database: 'image'
         });
-        connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum, AVG(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY))) AS avg FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
+        connection.query("SELECT park_id, COUNT(*) AS count, SUM(actual_fee) AS sum, AVG(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY))) AS avg, SUM(TIMESTAMPDIFF(MONTH, validfrom, DATE_ADD(validto, INTERVAL 1 DAY)) >= 6) AS diff FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startDate + "' AND crt_time < '" + req.query.endDate + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R' GROUP BY park_id", function (error, results, fields) {
             if (error) throw error;
             var orders = {};
             results.forEach(function (order) {
@@ -52,7 +52,7 @@ router.get('/', function (req, res, next) {
                         getInfo(db, 0, keys, parkInfo, function () {
                             db.close();
                             querying = false;
-                            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,线上包月支付期限,首次使用线上支付包月的笔数,首次使用线上支付包月的金额,首次使用线上包月支付期限,包月总支付笔数,包月总金额";
+                            var str = "park_id,场库,合伙人,包月线上支付笔数,包月线上支付金额,线上包月支付期限,单笔半年及以上订单数,首次使用线上支付包月的笔数,首次使用线上支付包月的金额,首次使用线上包月支付期限,包月总支付笔数,包月总金额";
                             for (var key in orders) {
                                 if (!orders[key].count) {
                                     orders[key].count = 0;
@@ -68,7 +68,7 @@ router.get('/', function (req, res, next) {
                                     orders[key].fs = 0;
                                     orders[key].fa = NaN;
                                 }
-                                str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + orders[key].avg + "," + orders[key].fc + "," + orders[key].fs + "," + orders[key].fa + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
+                                str = str + "\n" + key + "," + parkInfo[key].parkName + "," + parkInfo[key].name + "," + orders[key].count + "," + orders[key].sum + "," + orders[key].avg + "," + orders[key].diff + "," + orders[key].fc + "," + orders[key].fs + "," + orders[key].fa + "," + (orders[key].count + orders[key].c) + "," + (orders[key].sum - orders[key].s);
                             }
                             res.send(str);
                         });

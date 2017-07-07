@@ -30,8 +30,6 @@ router.get('/', function (req, res, next) {
         co(function*() {
             var db = yield MongoClient.connect(DB_CONN_STR);
             var endTime = new Date(req.query.endTime);
-            var startTime = new Date(req.query.startTime);
-            startTime.setHours(0);
             startTime.setMinutes(0);
             startTime.setSeconds(0);
             for (; startTime < endTime;) {
