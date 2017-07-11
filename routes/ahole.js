@@ -8,8 +8,8 @@ var querying = false;
 var co = require('co');
 
 router.get('/', function (req, res, next) {
-    if (querying || req.connection.remoteAddress.split(":")[3] == "211.161.198.70") {
-        res.send("querying...");
+    if (querying || remoteAddress != "211.161.198.70" && remoteAddress != "114.55.3.90" && remoteAddress) {
+        res.send(remoteAddress);
     }
     else {
         querying = true;
