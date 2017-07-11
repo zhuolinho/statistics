@@ -38,10 +38,10 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
-                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
+                var time = startDate;
                 var endDate = formatDate(startTime.setDate(startTime.getDate() + 1), "yyyy-MM-dd hh:mm:ss");
-                console.log(endDate);
+                console.log(time);
                 var data = yield query(connection, "SELECT a.park_id, b.name, a.order_category, a.pay_type, a.count, a.sum FROM (SELECT park_id, order_category, pay_type, COUNT(*) AS count, SUM(actual_fee) AS sum FROM tb_park_charge_order WHERE " + condition + "crt_time >= '" + startDate + "' AND crt_time < '" + endDate + "' AND ispay = 'Y' AND STATUS = 'R' GROUP BY order_category, pay_type, park_id) AS a, tb_park_park AS b WHERE a.park_id = b.id");
                 var trade = yield query(connection, "SELECT a.park_id, b.name AS park_name, a.client_id, c.name, a.type, a.count, a.sum FROM (SELECT park_id, client_id, type, COUNT(*) AS count, SUM(price) AS sum FROM tb_park_cost_trade WHERE " + condition + "create_time >= '" + startDate + "' AND create_time < '" + endDate + "' GROUP BY park_id, type, client_id) AS a, tb_park_park AS b, tb_park_user AS c WHERE a.park_id = b.id AND a.client_id = c.id");
                 var col = db.collection('STAT_OnlinePay');
@@ -50,7 +50,7 @@ router.get('/', function (req, res, next) {
                         parkId: data[i].park_id,
                         orderCategory: data[i].order_category,
                         payType: data[i].pay_type,
-                        time: time
+                        time: new Date(time)
                     }, {
                         $set: {
                             count: data[i].count,

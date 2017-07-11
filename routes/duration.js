@@ -39,10 +39,10 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
-                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
+                var time = startDate;
                 var endDate = formatDate(startTime.setDate(startTime.getDate() + 1), "yyyy-MM-dd hh:mm:ss");
-                console.log(endDate);
+                console.log(time);
                 var range = ["AND park_duration <= 3600000 ", "AND park_duration > 3600000 AND park_duration <= 7200000 ", "AND park_duration > 7200000 AND park_duration <= 10800000 ", "AND park_duration > 10800000 AND park_duration <= 14400000 ", "AND park_duration > 14400000 AND park_duration <= 18000000 ", "AND park_duration > 18000000 AND park_duration <= 21600000 ", "AND park_duration > 21600000 AND park_duration <= 25200000 ", "AND park_duration > 25200000 AND park_duration <= 28800000 ", "AND park_duration > 28800000 "];
                 for (var j = 0; j < 9; j++) {
                     var data = yield query(connection, "SELECT a.*, b.name FROM (SELECT COUNT(*) AS count, park_id, cost_type FROM tb_park_charge_cost WHERE " + condition + "out_time >= '" + startDate + "' AND out_time < '" + endDate + "' " + range[j] + "GROUP BY park_id, cost_type) AS a, tb_park_park AS b WHERE a.park_id = b.id");
@@ -52,7 +52,7 @@ router.get('/', function (req, res, next) {
                         var r = yield col.updateMany({
                             parkId: data[i].park_id,
                             costType: data[i].cost_type,
-                            time: time,
+                            time: new Date(time),
                             parkDuration: j
                         }, {
                             $set: {

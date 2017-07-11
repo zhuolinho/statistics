@@ -39,18 +39,18 @@ router.get('/', function (req, res, next) {
                     var arr = req.query.parkIds.split(",");
                     condition = "park_id IN ('" + arr.join("','") + "') AND ";
                 }
-                var time = startTime;
                 var startDate = formatDate(startTime, "yyyy-MM-dd hh:mm:ss");
+                var time = startDate;
                 var hours = startTime.getHours();
                 var endDate = formatDate(startTime.setHours(hours + 1), "yyyy-MM-dd hh:mm:ss");
-                console.log(endDate);
+                console.log(new Date(time), hours);
                 var data = yield query(connection, "SELECT b.ID, b.cameraname, a.status, a.count, b.park_id, c.name FROM (SELECT cameraid, status, COUNT(*) AS COUNT, park_id FROM tb_park_plate WHERE " + condition + "date_time >= '" + startDate + "' AND date_time < '" + endDate + "' GROUP BY cameraid, status) AS a, tb_park_camera AS b, tb_park_park AS c WHERE a.cameraid = b.ID AND a.park_id = c.id");
                 var col = db.collection('STAT_Camera');
                 for (var i = 0; i < data.length; i++) {
                     var r = yield col.updateMany({
                         cameraId: data[i].ID,
                         status: data[i].status,
-                        time: time
+                        time: new Date(time)
                     }, {
                         $set: {
                             cameraName: data[i].cameraname,
