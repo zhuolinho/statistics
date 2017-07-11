@@ -12,6 +12,7 @@ var op = require('./routes/op');
 var pay = require('./routes/pay');
 var camera = require('./routes/camera');
 var duration = require('./routes/duration');
+var ahole = require('./routes/ahole');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use('/op', op);
 app.use('/pay', pay);
 app.use('/camera', camera);
 app.use('/duration', duration);
+app.use('/ahole', ahole);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
