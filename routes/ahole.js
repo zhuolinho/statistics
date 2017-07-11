@@ -13,19 +13,29 @@ router.get('/', function (req, res, next) {
         res.send(remoteAddress);
     }
     else {
-        querying = true;
-        var connection = mysql.createConnection({
-            host: 'rr-bp16k64rx4lk50917.mysql.rds.aliyuncs.com',
-            user: 'tcc_query',
-            password: 'querythinkLight123',
-            database: 'tcc'
-            // host: '54.222.179.73',
-            // user: 'image',
-            // password: 'image@thinkLight',
-            // database: 'image'
-        });
         co(function*() {
-            var data = yield query(connection, "SELECT crt_time, park_id, validto, validfrom, platenumber, fee, actual_fee, product_start_time, product_end_time, is_renewal FROM tb_park_charge_order WHERE order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R'");
+            querying = true;
+            var connection = mysql.createConnection({
+                host: 'rr-bp16k64rx4lk50917.mysql.rds.aliyuncs.com',
+                user: 'tcc_query',
+                password: 'querythinkLight123',
+                database: 'tcc'
+                // host: '54.222.179.73',
+                // user: 'image',
+                // password: 'image@thinkLight',
+                // database: 'image'
+            });
+            var data = yield query(connection, "SELECT a.*, b.name FROM(SELECT id, crt_time, park_id, validto, validfrom, platenumber, fee, actual_fee, product_start_time, product_end_time, is_renewal FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startTime + "' AND crt_time < '" + req.query.endTime + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R')AS a, tb_park_park AS b WHERE a.park_id = b.id");
+            connection.end();
+            connection = mysql.createConnection({
+                host: '54.222.179.73',
+                user: 'image',
+                password: 'image@thinkLight',
+                database: 'test'
+            });
+            for (var i = 0; i < data.length; i++) {
+                var msg = yield query(connection, "INSERT INTO stat_sp SET ? ON DUPLICATE KEY UPDATE id = id", data[i]);
+            }
             connection.end();
             querying = false;
             res.send(data);
@@ -33,9 +43,9 @@ router.get('/', function (req, res, next) {
     }
 });
 
-function query(client, sql) {
+function query(client, sql, values) {
     return new Promise(function (resolve, reject) {
-        client.query(sql, function (err, rows) {
+        client.query(sql, values, function (err, rows) {
             if (err) {
                 reject(err);
             } else {
