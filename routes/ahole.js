@@ -26,6 +26,7 @@ router.get('/', function (req, res, next) {
                 // database: 'image'
             });
             var data = yield query(connection, "SELECT a.*, b.name FROM(SELECT id, crt_time, park_id, validto, validfrom, platenumber, fee, actual_fee, product_start_time, product_end_time, is_renewal FROM tb_park_charge_order WHERE crt_time >= '" + req.query.startTime + "' AND crt_time < '" + req.query.endTime + "' AND order_category = 'SP' AND ispay = 'Y' AND STATUS = 'R')AS a, tb_park_park AS b WHERE a.park_id = b.id");
+            var result = yield query(connection, "SELECT a.*, b.name FROM(SELECT id, create_time, type, park_id, need_price, price, ref_msg, client_id FROM tb_park_cost_trade WHERE create_time >= '" + req.query.startTime + "' AND create_time < '" + req.query.endTime + "' AND TYPE = 'SPOTHER' OR TYPE = 'PAYOTHER')AS a, tb_park_park AS b WHERE a.park_id = b.id");
             connection.end();
             connection = mysql.createConnection({
                 host: '54.222.179.73',
@@ -34,11 +35,14 @@ router.get('/', function (req, res, next) {
                 database: 'test'
             });
             for (var i = 0; i < data.length; i++) {
-                var msg = yield query(connection, "INSERT INTO stat_sp SET ? ON DUPLICATE KEY UPDATE id = id", data[i]);
+                yield query(connection, "INSERT INTO stat_sp SET ? ON DUPLICATE KEY UPDATE id = id", data[i]);
+            }
+            for (var i = 0; i < result.length; i++) {
+                yield query(connection, "INSERT INTO stat_trade SET ? ON DUPLICATE KEY UPDATE id = id", result[i]);
             }
             connection.end();
             querying = false;
-            res.send(data);
+            res.send(result);
         });
     }
 });
